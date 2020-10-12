@@ -1,13 +1,17 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+import {Button} from 'antd'
+
+const Home = ({name}) => {
   return (
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <Button>{name}</Button>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
@@ -63,3 +67,11 @@ export default function Home() {
     </div>
   )
 }
+
+Home.getInitialProps = async() => {
+  return {
+    name: 'naixes'
+  }
+}
+
+export default Home
