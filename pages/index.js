@@ -1,7 +1,13 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import styled from 'styled-components'
 
 import {Button} from 'antd'
+
+const Title = styled.h1`
+  color: yellow;
+  font-size: 40px;
+`
 
 const Home = ({name}) => {
   return (
@@ -13,10 +19,25 @@ const Home = ({name}) => {
 
       <Button>{name}</Button>
 
+      <Title>this is Styled Title</Title>
+
       <main className={styles.main}>
-        <h1 className={styles.title}>
+        <h1 className={styles.title, 'link'}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+
+        {/* 定义样式，组件间隔离 */}
+        <style jsx>{`
+          .link {
+            color: red;
+          }
+        `}</style>
+        {/* 全局样式，但是只有在该组件加载之后才会生效 */}
+        <style jsx global>{`
+          p {
+            color: blue;
+          }
+        `}</style>
 
         <p className={styles.description}>
           Get started by editing{' '}
