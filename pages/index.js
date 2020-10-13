@@ -9,7 +9,7 @@ const Title = styled.h1`
   font-size: 40px;
 `
 
-const Home = ({name}) => {
+const Home = ({name, time}) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -25,6 +25,8 @@ const Home = ({name}) => {
         <h1 className={styles.title, 'link'}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+
+        <h2>{time}</h2>
 
         {/* 定义样式，组件间隔离 */}
         <style jsx>{`
@@ -90,8 +92,11 @@ const Home = ({name}) => {
 }
 
 Home.getInitialProps = async() => {
+  // 异步加载模块
+  const moment = await import('moment')
   return {
-    name: 'naixes'
+    name: 'naixes',
+    time: moment.default(Date.now() - 60 * 1000).fromNow()
   }
 }
 
