@@ -379,7 +379,7 @@ Router.events.off('routeChangeStart', handleRouteChange)
 
 应用：`loading`
 
-##### `getInitialProps`
+#### `getInitialProps`
 
 组件上的静态方法，`nextjs`的数据获取规范，用于在页面或`App`中数据获取，可以完成客户端和服务端数据的同步
 
@@ -439,7 +439,7 @@ export default Page
 - `jsonPageRes` - [获取数据响应对象](https://developer.mozilla.org/en-US/docs/Web/API/Response) (只有客户端有)
 - `err` - 渲染过程中的任何错误
 
-##### 自定义`app`
+#### 自定义`app`
 
 作用：布局`Layout`，保持公用状态，给页面传入自定义数据，自定义错误处理
 
@@ -471,7 +471,7 @@ class MyApp extends App {
 export default MyApp
 ```
 
-##### 自定义`document`
+#### 自定义`document`
 
 `document`：只有在服务端渲染时才会被调用的组件，用来修改服务端渲染的文档内容，一般用来配合第三方`css-in-js`方案使用
 
@@ -517,11 +517,11 @@ import Head from 'next/head'
 ...
 ```
 
-##### 定义样式
+#### 定义样式
 
 `nextjs`默认不支持引入`css`，需要修改配置，见上文
 
-`nextjs`默认的`css-in-js`方案
+##### 默认的`css-in-js`方案
 
 ```react
 ...
@@ -611,11 +611,11 @@ const Title = styled.h1`
 ...
 ```
 
-##### LazyLoading
+#### LazyLoading
 
 `nextjs`默认页面支持`LazyLoading`
 
-###### 异步加载模块
+##### 异步加载模块
 
 当一半以上页面加载了相同的模块，会被提取到公共模块导致每次打开页面都会去加载它。
 
@@ -632,7 +632,7 @@ Home.getInitialProps = async() => {
 }
 ```
 
-###### 异步加载组件
+##### 异步加载组件
 
 ```js
 import dynamic from 'next/dynamic'
@@ -641,7 +641,7 @@ import dynamic from 'next/dynamic'
 const Comp = dynamic(import('xxx/xxx.js'))
 ```
 
-##### `next.config.js`
+#### `next.config.js`
 
 修改`nextjs`配置
 
@@ -709,3 +709,18 @@ if(typeof require !== 'undefined') {
 module.exports = withCss({})
 ```
 
+#### `ssr`流程
+
+**服务端页面渲染**：开始-》浏览器发起`page`请求-》koa收到请求并调用`nextjs`-》`nextjs`开始渲染-》调用`document/app`的`getInitialProps`-》调用页面上的`getInitialProps`-》渲染出`html`-》返回给浏览器进行渲染
+
+nextjs会把服务端渲染产生的数据在返回中列出来，可以在请求的响应中查看到，在客户端可以进行复用
+
+**客户端路由跳转**：开始-》点击链接按钮-》异步加载页面js（`nextjs`对于每个`page`都会分开打包）-》调用页面上的`getInitialProps`-》数据返回，路由变化-》渲染新页面
+
+推荐在`getInitialProps`执行数据请求而不是在组件的生命周期里，方便进行数据同步，也是`nextjs`的重要功能
+
+## `React Hooks`
+
+*Hook* 是 React 16.8 的新增特性。它可以让你在不编写 class 的情况下使用 state 以及其他的 React 特性
+
+具体参考`note/react/组件`的`Hooks`部分
