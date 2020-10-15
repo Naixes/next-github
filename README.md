@@ -724,3 +724,6 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 *Hook* 是 React 16.8 的新增特性。它可以让你在不编写 class 的情况下使用 state 以及其他的 React 特性
 
 具体参考`note/react/组件`的`Hooks`部分
+
+## 集成`redux`
+
