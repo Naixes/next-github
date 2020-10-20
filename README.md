@@ -778,7 +778,7 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 ![Authorization Code流程](E:\Jennifer\other\next-github\public\Authorization Code流程.png)
 
-##### 步骤
+##### `github OAuth`步骤
 
 1. 注册`github-auth-app`，`setteings` ------ `developer settings` ------ `new`
 
@@ -805,3 +805,27 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 `redirect_uri`，`state`
 
 （`restlet`工具：发送请求）
+
+##### 安全性
+
+一次性的`code`
+
+`id`+`secret`
+
+`redirect_uri`必须和注册时相同
+
+#### `cookie`和`session`
+
+`cookie`的作用之一是保存`session`的`id`，由服务端通过`id`查询用户信息设置`session`
+
+安装包`koa-session`
+
+##### `koa-session`存储
+
+使用`koa-session`的`store`把`id`和用户信息存储在`redis`
+
+提供`get`，`set`，`destroy`
+
+#### 接入到`nextjs`
+
+安装`axios`

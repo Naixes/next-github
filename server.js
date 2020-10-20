@@ -27,6 +27,7 @@ app.prepare().then(() => {
     // next作为koa的中间件
     server.use(async (ctx, next) => {
         await handler(ctx.req, ctx.res)
+        // 指不使用koa内置的body处理，手动返回响应内容
         ctx.respond = false
     })
 
