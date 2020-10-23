@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
     "@zeit/next-css": "^1.0.1",
     "antd": "^4.7.0",
     "babel-plugin-styled-components": "^1.11.1",

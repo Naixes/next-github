@@ -1,8 +1,8 @@
 ## `Next.js`
 
-`Next.js*` 是一个轻量级的 React 服务端渲染应用框架
+`Next.js` 是一个轻量级的 React 服务端渲染应用框架
 
-### nextjs`项目创建
+### `nextjs`项目创建
 
 1. 手动创建
 
@@ -222,6 +222,45 @@ function MyApp({ Component, pageProps }) {
 }
 
 export default MyApp
+```
+
+#### `icon`组件`v4`更新
+
+需要先`npm install --save @ant-design/icons`
+
+4.0 中会采用按需引入的方式：
+
+```diff
+  import { Button } from 'antd';
+
+  // tree-shaking supported
+- import { Icon } from 'antd';
++ import { SmileOutlined } from '@ant-design/icons';
+
+  const Demo = () => (
+    <div>
+-     <Icon type="smile" />
++     <SmileOutlined />
+      <Button icon={<SmileOutlined />} />
+    </div>
+  );
+
+  // or directly import
+  import SmileOutlined from '@ant-design/icons/SmileOutlined';
+```
+
+你将仍然可以通过兼容包继续使用：
+
+```jsx
+import { Button } from 'antd';
+import { Icon } from '@ant-design/compatible';
+
+const Demo = () => (
+  <div>
+    <Icon type="smile" />
+    <Button icon="smile" />
+  </div>
+);
 ```
 
 ### `nextjs`基础
@@ -749,7 +788,7 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 授权不一定先认证
 
-### OAuth
+### `OAuth`
 
 一种行业标准的授权方式
 
@@ -759,7 +798,7 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 - **Authorization Code**
 - Refresh Token
-- Device Code：TV
+- `Device Code`：TV
 - Password
 - Implicit
 - Client Credentials
@@ -778,7 +817,7 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 ![Authorization Code流程](E:\Jennifer\other\next-github\public\Authorization Code流程.png)
 
-##### `github OAuth`步骤
+##### `githubOAuth`步骤
 
 1. 注册`github-auth-app`，`setteings` ------ `developer settings` ------ `new`
 
@@ -828,4 +867,8 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 #### 接入到`nextjs`
 
-安装`axios`
+## 项目开发
+
+### 布局
+
+`vscode-styled-jsx` 插件

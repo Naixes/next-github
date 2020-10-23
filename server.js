@@ -33,6 +33,6 @@ app.prepare().then(() => {
 
     // 监听服务
     server.listen(3002, () => {
-        console.log('server on 3000')
+        console.log('server on 3002')
     })
 })
