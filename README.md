@@ -872,3 +872,62 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 ### 布局
 
 `vscode-styled-jsx` 插件
+
+使用`Layout`组件在`app`中进行布局
+
+#### `container`组件
+
+一个容器组件，居中且最大宽度1200
+
+`copm`属性可以将标签类型传递到子组件内部
+
+```jsx
+const style = {
+    maxWidth: 1200,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: 20,
+    paddingRight: 20,
+}
+
+// copm属性可以将标签类型传递到子组件内部，但是不能自定义属性
+const MyContainer = ({children, comp: Comp}) => {
+    return (
+        <Comp style={style}>{children}</Comp>
+    )
+}
+
+export default MyContainer
+```
+
+##### 使用`cloneElement`扩展组件
+
+作用：可以在父组件给子组件添加样式等，而不需要在单独增加一层标签；组件`props`合并
+
+```jsx
+import {cloneElement} from 'react'
+
+const style = {
+    maxWidth: 1200,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: 20,
+    paddingRight: 20,
+}
+
+const MyContainer = ({children, renderEle = <div />}) => {
+    // 给renderEle增加属性
+    return cloneElement(renderEle, {
+        style: Object.assign({}, renderEle.props.style, style),
+        children
+    })
+}
+
+export default MyContainer
+
+// 使用
+<Container renderEle={<div className="header-inner" />}></...>
+```
+
+
+

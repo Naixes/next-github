@@ -1,6 +1,7 @@
 import {Layout, Input, Avatar} from 'antd'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons';
 import {useCallback, useState} from 'react'
+import Container from '../components/Container'
 
 const {Header, Content, Footer} = Layout
 
@@ -30,7 +31,7 @@ const MyLayout = ({children}) => {
     return (<Layout>
         <Header>
             {/* header不能直接增加class */}
-            <div className="header-inner">
+            <Container renderEle={<div className="header-inner" />}>
                 <div className="header-left">
                     <div className="logo">
                         <GithubOutlined  style={githubIconStyle}/>
@@ -49,9 +50,11 @@ const MyLayout = ({children}) => {
                         <Avatar size={40} icon={<UserOutlined />}></Avatar>
                     </div>
                 </div>
-            </div>
+            </Container>
         </Header>
-        <Content>{children}</Content>
+        <Content>
+            <Container>{children}</Container>
+        </Content>
         <Footer style={footerStyle}>
             develop by Naixes @
             <a href="https://github.com/Naixes">https://github.com/Naixes</a>
