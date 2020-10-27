@@ -6,7 +6,7 @@ module.exports = {
     github: {
         request_token_url: 'https://github.com/login/oauth/access_token',
         client_id,
-        client_secret: 'e4bc52bdcbb57c2359ba149123178f26ba431e8f'
+        client_secret: '49ec227fa4fb8fe4d7fa9dbc782c976370cba1dd'
     },
     OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${client_id}&scope=${SCOPE}`
 }
