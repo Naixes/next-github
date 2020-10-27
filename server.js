@@ -1,6 +1,7 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const next = require('next')
+const session = require('koa-session')
 
 const dev = process.env.NODE_ENV !== 'production'
 // 初始化next
@@ -12,6 +13,14 @@ const handler = app.getRequestHandler()
 app.prepare().then(() => {
     const server = new Koa()
     const router = new Router()
+
+    // session
+    server.keys = ['Naixes develop github App']
+    const SESSION_CONFIG = {
+        key: 'jid',
+        maxAge: 24 * 60 * 60 * 1000
+    }
+    server.use(session(SESSION_CONFIG, server))
 
     // 解决路由映射刷新时404的问题
     // router.get('/a/:id', async(ctx) => {

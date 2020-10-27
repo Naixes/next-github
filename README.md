@@ -819,7 +819,7 @@ nextjs会把服务端渲染产生的数据在返回中列出来，可以在请�
 
 ##### `githubOAuth`步骤
 
-1. 注册`github-auth-app`，`setteings` ------ `developer settings` ------ `new`
+1. 注册`github-auth-app`，头像------`setteings` ------ `developer settings` ------ `OAuth Apps`------`new`
 
 2. 保存`clientid`和`clientsecret`
 
