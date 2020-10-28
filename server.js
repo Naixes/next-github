@@ -2,6 +2,14 @@ const Koa = require('koa')
 const Router = require('koa-router')
 const next = require('next')
 const session = require('koa-session')
+const Redis = require('ioredis')
+
+const config = require('./config')
+// eedisSessionStore
+const RedisSessionStore = require('./server/session-store')
+
+// redis
+const redis = new Redis(config.redis)
 
 const dev = process.env.NODE_ENV !== 'production'
 // 初始化next
@@ -18,7 +26,8 @@ app.prepare().then(() => {
     server.keys = ['Naixes develop github App']
     const SESSION_CONFIG = {
         key: 'jid',
-        maxAge: 24 * 60 * 60 * 1000
+        maxAge: 24 * 60 * 60 * 1000,
+        store: new RedisSessionStore(redis)
     }
     server.use(session(SESSION_CONFIG, server))
 

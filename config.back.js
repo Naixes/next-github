@@ -8,5 +8,9 @@ module.exports = {
         client_id,
         client_secret: ''
     },
-    OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${client_id}&scope=${SCOPE}`
+    OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${client_id}&scope=${SCOPE}`,
+    redis: {
+        port: 0,
+        password: 0
+    }
 }
