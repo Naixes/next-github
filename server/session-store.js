@@ -38,7 +38,7 @@ class RedisSessionStore {
         }
     }
     // 删除
-    async set(sid) {
+    async destroy(sid) {
         const id = getRedisSessionId(sid)
         try {
             await this.client.del(id)
@@ -47,3 +47,5 @@ class RedisSessionStore {
         }
     }
 }
+
+module.exports = RedisSessionStore
