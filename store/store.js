@@ -15,17 +15,21 @@ function userReducer(state = userInitialState, action) {
     }
 }
 
+// action creator
 // 退出登录
+// redux-thunk中间件可以让store处理异步
 export function logout () {
-    axios.post('/logout').then(res => {
-        if(res.status === 200) {
-            dispatch({type: LOGOUT})
-        }else {
-            console.log('logout fail');
-        }
-    }).catch(err => {
-        console.log('logout fail', err);
-    })
+    return dispatch => {
+        axios.post('/logout').then(res => {
+            if(res.status === 200) {
+                dispatch({type: LOGOUT})
+            }else {
+                console.log('logout fail');
+            }
+        }).catch(err => {
+            console.log('logout fail', err);
+        })
+    }
 }
 
 const allReducer = combineReducers({
@@ -37,7 +41,11 @@ export default function initoalizeStore(state) {
     return createStore(
         allReducer,
         // 合并state，state：初始化时传入的initialState
-        Object.assign({}, {user: userInitialState}, state),
+        Object.assign(
+            {}, 
+            {user: userInitialState}, 
+            state
+        ),
         // 使用redux-devtools-extension插件
         composeWithDevTools(applyMiddleware(ReduxThunk))
     )

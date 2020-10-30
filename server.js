@@ -7,6 +7,7 @@ const Redis = require('ioredis')
 const config = require('./config')
 // eedisSessionStore
 const RedisSessionStore = require('./server/session-store')
+const auth = require('./server/auth')
 
 // redis
 const redis = new Redis(config.redis)
@@ -30,6 +31,8 @@ app.prepare().then(() => {
         store: new RedisSessionStore(redis)
     }
     server.use(session(SESSION_CONFIG, server))
+    // 授权登录
+    auth(server)
 
     // 解决路由映射刷新时404的问题
     // router.get('/a/:id', async(ctx) => {
@@ -44,9 +47,16 @@ app.prepare().then(() => {
 
     // next作为koa的中间件
     server.use(async (ctx, next) => {
+        // 将登录信息返回
+        ctx.req.session = ctx.session
         await handler(ctx.req, ctx.res)
         // 指不使用koa内置的body处理，手动返回响应内容
         ctx.respond = false
+    })
+
+    // 解决Error: read ECONNRESET报错
+    server.on('close',function(isException){
+        console.log('close', isException);
     })
 
     // 监听服务

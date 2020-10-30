@@ -1,5 +1,6 @@
 // @zeit/next-plugins中可以查找到相关文档
 const withCss = require('@zeit/next-css')
+const config = require('./config')
 
 // 可配置项
 const configs = {
@@ -58,4 +59,8 @@ if(typeof require !== 'undefined') {
 }
 // withCss()会增加webpack对css的配置，传入要修改的config，withCss会生成一个config对象
 // 传入{webpack(){}}可以修改webpack的配置，可以参考node_modules中插件的源码
-module.exports = withCss({})
+module.exports = withCss({
+    publicRuntimeConfig: {
+        OAUTH_URL: config.OAUTH_URL
+    }
+})

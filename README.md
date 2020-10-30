@@ -929,5 +929,45 @@ export default MyContainer
 <Container renderEle={<div className="header-inner" />}></...>
 ```
 
+### 登录登出
 
+#### 维持`OAuth`之前的页面访问
 
+```js
+// 授权登录
+server.use(async(ctx, next) => {
+    const {path, method} = ctx
+    // 记录授权登录之前的页面地址
+    // 作为授权成功后返回的地址
+    if(path === '/pre-auth' && method === 'GET') {
+        const {url} = ctx.query
+        ctx.session.urlBeforeOAuth = url
+        // 跳转到github登陆页面
+        ctx.redirect(`${config.OAUTH_URL}`)
+    }else {
+        await next()
+    }
+})
+```
+
+#### 遇到的问题
+
+1. `ECONNRESET`报错
+
+> 使用 `Node.js` 搭建的服务中，如果存在 HTTP 的 `RPC` 调用，并且使用了 `keep-alive` 来保持 TCP 长连接， 那么一定会有一个牛皮糖般的问题困扰着你，那就是 `ECONNRESET` 或者 `socket hang up` 这种错误。
+>
+> 其实这就是状态机里一个简单的竞争情形：
+>
+> 1. 客户端与服务端成功建立了长连接
+> 2. 连接静默一段时间（无 HTTP 请求）
+> 3. 服务端因为在一段时间内没有收到任何数据，主动关闭了 TCP 连接
+> 4. 客户端在收到 TCP 关闭的信息前，发送了一个新的 HTTP 请求
+> 5. 服务端收到请求后拒绝，客户端报错 `ECONNRESET`
+>
+> 总结一下就是：服务端先于客户端关闭了 TCP，而客户端此时还未同步状态，所以存在一个错误的暂态（客户端认为 TCP 连接依然在，但实际已经销毁了）
+>
+> 最佳的解决方法还是，如果出现了这种暂态导致的错误，那么重试一次请求就好，但是只识别 `ECONNRESET` 这个错误码是不够的，因为服务端可能因为某些原因真的关闭了 TCP 端口。
+
+参考：https://zhuanlan.zhihu.com/p/86953757
+
+2. Warning: Can't perform a React state update on an unmounted component.

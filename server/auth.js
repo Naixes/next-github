@@ -1,7 +1,7 @@
 const axios = require('axios')
 const config = require('../config')
 
-const {client_id, client_secret, request_token_url} = config
+const {client_id, client_secret, request_token_url} = config.github
 
 // github 授权
 module.exports = (server) => {
@@ -35,11 +35,11 @@ module.exports = (server) => {
                 ctx.session.githubAuth = result.data
                 const {access_token, token_type} = result.data
                 // 获取用户信息
-                const userInfoRes = axios({
+                const userInfoRes = await axios({
                     method: 'GET',
                     url: 'https://api.github.com/user',
                     headers: {
-                        'Authorization': `${access_token} ${token_type}`
+                        'Authorization': `${token_type} ${access_token}`
                     }
                 })
                 // 保存用户信息
@@ -63,7 +63,7 @@ module.exports = (server) => {
     // 退出登录
     server.use(async(ctx, next) => {
         const {path, method} = ctx
-        if(path === 'logout' && method === 'POST') {
+        if(path === '/logout' && method === 'POST') {
             // 清空授权信息和用户信息
             ctx.session = null
             ctx.body = 'logout success'

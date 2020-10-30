@@ -1,7 +1,11 @@
-import {Layout, Input, Avatar} from 'antd'
+import {Layout, Input, Avatar, Tooltip, Dropdown, Menu} from 'antd'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons';
 import {useCallback, useState} from 'react'
+import {withRouter} from 'next/router'
+import {connect} from 'react-redux'
+
 import Container from '../components/Container'
+import {logout} from '../store/store'
 
 const {Header, Content, Footer} = Layout
 
@@ -19,7 +23,7 @@ const footerStyle = {
     textAlign: 'center'
 }
 
-const MyLayout = ({children}) => {
+const MyLayout = ({children, user, router, logout}) => {
     const [search, setSearch] = useState('');
 
     const handleOnChange = useCallback(e => {
@@ -27,6 +31,20 @@ const MyLayout = ({children}) => {
     }, [setSearch])
 
     const handleOnSearch = useCallback(() => {})
+
+    const handleLogout = useCallback(() => {
+        logout()
+    }, [])
+
+    const userDropdown = () => {
+        return (
+            <Menu>
+                <Menu.Item>
+                    <a onClick={handleLogout}>登 出</a>
+                </Menu.Item>
+            </Menu>
+        )
+    }
 
     return (<Layout>
         <Header>
@@ -47,7 +65,19 @@ const MyLayout = ({children}) => {
                 </div>
                 <div className="header_right">
                     <div className="user">
-                        <Avatar size={40} icon={<UserOutlined />}></Avatar>
+                        {user && user.id ? (
+                        <Dropdown overlay={userDropdown}>
+                            <a href={`/`}>
+                                <Avatar size={40} src={user.avatar_url}></Avatar>
+                            </a>
+                        </Dropdown>
+                        ) : (
+                        <Tooltip title="点击进行登录">
+                            <a href={`/pre-auth?url=${router.asPath}`}>
+                                <Avatar size={40} icon={<UserOutlined />}></Avatar>
+                            </a>
+                        </Tooltip>
+                        )}
                     </div>
                 </div>
             </Container>
@@ -87,4 +117,15 @@ const MyLayout = ({children}) => {
     </Layout>)
 }
 
-export default MyLayout
+export default connect(
+    function mapState(state) {
+        return {
+            user: state.user
+        }
+    },
+    function mapReducer(dispatch) {
+        return {
+            logout: () => dispatch(logout())
+        }
+    }
+)(withRouter(MyLayout))
