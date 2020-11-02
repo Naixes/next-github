@@ -931,6 +931,8 @@ export default MyContainer
 
 ### 登录登出
 
+使用`redux`，`redis`和`GitHub OAuth`完成
+
 #### 维持`OAuth`之前的页面访问
 
 ```js
@@ -971,3 +973,43 @@ server.use(async(ctx, next) => {
 参考：https://zhuanlan.zhihu.com/p/86953757
 
 2. Warning: Can't perform a React state update on an unmounted component.
+
+### 全局Loading
+
+`_app.js`中监听路由事件
+
+```jsx
+class MyApp extends App {
+  state = {
+    loading: false
+  }
+  startLoading = () => {
+    this.setState({loading: true})
+  }
+  stopLoading = () => {
+    this.setState({loading: false})
+  }
+  componentDidMount() {
+    Router.events.on('routerChangeStart', this.startLoading)
+    Router.events.on('routerChangeComplate', this.stopLoading)
+    Router.events.on('routerChangeError', this.stopLoading)
+  }
+  componentWillUnmount() {
+    Router.events.off('routerChangeStart', this.startLoading)
+    Router.events.off('routerChangeComplate', this.stopLoading)
+    Router.events.off('routerChangeError', this.stopLoading)
+  }
+  ...
+  render() {
+    const {Component, pageProps, reduxStore} = this.props
+    const {loading} = this.state
+    return <Provider store={reduxStore}>
+      {loading ? <Loading /> : null}
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </Provider>
+  }
+}
+```
+
