@@ -8,6 +8,7 @@ const config = require('./config')
 // eedisSessionStore
 const RedisSessionStore = require('./server/session-store')
 const auth = require('./server/auth')
+const api = require('./server/api')
 
 // redis
 const redis = new Redis(config.redis)
@@ -33,6 +34,8 @@ app.prepare().then(() => {
     server.use(session(SESSION_CONFIG, server))
     // 授权登录
     auth(server)
+    // 接口代理
+    api(server)
 
     // 解决路由映射刷新时404的问题
     // router.get('/a/:id', async(ctx) => {
