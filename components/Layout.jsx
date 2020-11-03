@@ -3,6 +3,7 @@ import { GithubOutlined, UserOutlined } from '@ant-design/icons';
 import {useCallback, useState} from 'react'
 import {withRouter} from 'next/router'
 import {connect} from 'react-redux'
+import Link from 'next/link'
 
 import Container from '../components/Container'
 import {logout} from '../store/store'
@@ -24,13 +25,18 @@ const footerStyle = {
 }
 
 const MyLayout = ({children, user, router, logout}) => {
-    const [search, setSearch] = useState('');
+    // 刷新后保留输入框中的内容
+    const urlQuery = router.query && router.query.query
+    const [search, setSearch] = useState(urlQuery || '');
 
     const handleOnChange = useCallback(e => {
         setSearch(e.target.value)
     }, [setSearch])
 
-    const handleOnSearch = useCallback(() => {})
+    const handleOnSearch = useCallback(() => {
+        // 跳转路由
+        router.push(`/search?query=${search}`)
+    }, [search])
 
     const handleLogout = useCallback(() => {
         logout()
@@ -52,7 +58,9 @@ const MyLayout = ({children, user, router, logout}) => {
             <Container renderEle={<div className="header-inner" />}>
                 <div className="header-left">
                     <div className="logo">
-                        <GithubOutlined  style={githubIconStyle}/>
+                        <Link href="/">
+                            <GithubOutlined  style={githubIconStyle}/>
+                        </Link>
                     </div>
                     <div>
                         <Input.Search 

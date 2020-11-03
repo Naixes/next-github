@@ -929,11 +929,11 @@ export default MyContainer
 <Container renderEle={<div className="header-inner" />}></...>
 ```
 
-### 登录登出
+#### 登录登出
 
 使用`redux`，`redis`和`GitHub OAuth`完成
 
-#### 维持`OAuth`之前的页面访问
+##### 维持`OAuth`之前的页面访问
 
 ```js
 // 授权登录
@@ -952,7 +952,7 @@ server.use(async(ctx, next) => {
 })
 ```
 
-#### 遇到的问题
+##### 遇到的问题
 
 1. `ECONNRESET`报错
 
@@ -974,7 +974,7 @@ server.use(async(ctx, next) => {
 
 2. Warning: Can't perform a React state update on an unmounted component.
 
-### 全局Loading
+#### 全局Loading
 
 `_app.js`中监听路由事件
 
@@ -1013,7 +1013,7 @@ class MyApp extends App {
 }
 ```
 
-### `github`接口代理
+#### `github`接口代理
 
 `rate limiting`：未登录，每小时60个，登陆后，每个用户每小时5000次
 
@@ -1064,4 +1064,8 @@ module.exports = (server) => {
     })
 }
 ```
+
+#### 完善布局
+
+`search`跳转，刷新后保留输入框中的内容
 
