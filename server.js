@@ -58,8 +58,8 @@ app.prepare().then(() => {
     })
 
     // 解决Error: read ECONNRESET报错
-    server.on('close',function(isException){
-        console.log('close', isException);
+    server.on('error', function(isException){
+        console.log('server error', isException);
     })
 
     // 监听服务

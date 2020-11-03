@@ -28,10 +28,6 @@ class MyApp extends App {
     Router.events.on('routerChangeStart', this.startLoading)
     Router.events.on('routerChangeComplate', this.stopLoading)
     Router.events.on('routerChangeError', this.stopLoading)
-
-    axios.get('/github/search/repositories?q=react').then(res => {
-      console.log(res);
-    })
   }
 
   componentWillUnmount() {

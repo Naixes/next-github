@@ -1069,3 +1069,110 @@ module.exports = (server) => {
 
 `search`跳转，刷新后保留输入框中的内容
 
+#### 完善接口处理
+
+##### 区分服务端和客户端
+
+```js
+// /pages/index.js
+import api from "../lib/api";
+
+const Index = () => <span>Index</span>
+
+// req 和 res只有在服务端渲染时才能拿到
+Index.getInitialProps = async ({ctx}) => {
+    // '/github/search/repositories?q=react'在服务端和客户端会读取成不同地址
+    // 服务端是localhost的80端口
+    // const result = await axios.get('/github/search/repositories?q=react')
+    const result = await api.request({
+        url: '/search/repositories?q=react'
+    }, ctx.req, ctx.res)
+
+    return {
+        data: result.data
+    }
+}
+
+export default Index
+```
+
+```js
+// /lib/api.js
+// 需要在客户端和服务端执行，不能使用import
+const axios = require("axios")
+
+const config = require('../config')
+
+const isServer = typeof window === 'undefined'
+
+async function requestGithub(url, method, data, headers) {
+    return await axios({
+        url: `${config.github.github_base_url}${url}`,
+        method,
+        data,
+        headers
+    })
+}
+
+// req 和 res只有在服务端渲染时才能拿到
+async function request({url, method='GET', data={}}, req, res) {
+    if(!url) {
+        throw Error('url must provide')
+    }
+    // 服务端直接请求github
+    if(isServer) {
+        const session = req.session
+        const githubAuth = session.githubAuth || {}
+        let headers = {}
+        
+        if(githubAuth.access_token) {
+            headers['Authorization'] = `${githubAuth.token_type} ${githubAuth.access_token}`
+        }
+        return await requestGithub(url, method, data, headers)
+    }else {
+        // 客户端直接请求自己的服务
+        return await axios({
+            url: `/github${url}`,
+            method,
+            data
+        })
+    }
+}
+
+module.exports = {
+    request,
+    requestGithub
+}
+```
+
+```js
+// /server/api.js
+const { requestGithub } = require('../lib/api')
+
+module.exports = (server) => {
+    server.use(async(ctx, next) => {
+        const {path} = ctx
+        if(path.startsWith('/github/')) {
+            const {session, method} = ctx
+            const githubAuth = session && session.githubAuth
+            let headers = {}
+            if(githubAuth && githubAuth.access_token) {
+                headers['Authorization'] = `${githubAuth.token_type} ${githubAuth && githubAuth.access_token}`
+            }
+
+            const result = await requestGithub(
+                ctx.url.replace('/github/', '/'),
+                method,
+                {},
+                headers
+            )
+
+            ctx.status = result.status
+            ctx.body = result.data
+        }else {
+            await next()
+        }
+    })
+}
+```
+
