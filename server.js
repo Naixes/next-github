@@ -3,6 +3,7 @@ const Router = require('koa-router')
 const next = require('next')
 const session = require('koa-session')
 const Redis = require('ioredis')
+const koaBody = require('koa-body')
 
 const config = require('./config')
 // eedisSessionStore
@@ -24,6 +25,8 @@ app.prepare().then(() => {
     const server = new Koa()
     const router = new Router()
 
+    // ctx.request.body获取
+    server.use(koaBody())
     // session
     server.keys = ['Naixes develop github App']
     const SESSION_CONFIG = {
