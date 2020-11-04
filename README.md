@@ -1163,7 +1163,7 @@ module.exports = (server) => {
             const result = await requestGithub(
                 ctx.url.replace('/github/', '/'),
                 method,
-                {},
+                ctx.request.body || {},
                 headers
             )
 
@@ -1176,3 +1176,8 @@ module.exports = (server) => {
 }
 ```
 
+### 首页
+
+判断用户登录
+
+列表tab页：在路由中保存当前tab，优化切换tab时重复获取数据（缓存：需要区分客户端和服务端）
