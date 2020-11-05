@@ -3,12 +3,17 @@ import Router, {withRouter} from 'next/router'
 import {Button, Tabs} from 'antd'
 import { MailOutlined } from '@ant-design/icons';
 import {useEffect} from 'react'
+import LRU from 'lru-cache'
 
 import api from "../lib/api";
 import Repo from '../components/Repo'
 
 const isServer = typeof window === 'undefined'
-let cacheUserRepos, cacheUserStaredRepos
+// let cacheUserRepos, cacheUserStaredRepos
+const cache = new LRU({
+    // 最长不使用时间，过了就会删除
+    maxAge: 1000 * 60 * 60
+})
 
 const Index = ({router, user, userRepos, userStaredRepos}) => {
     // 未登录时显示的内容
@@ -36,13 +41,23 @@ const Index = ({router, user, userRepos, userStaredRepos}) => {
         Router.push(`/?key=${activeKey}`)
     }
 
+    // 不使用依赖时只在组件第一次mount时调用
+    // userRepos, userStaredRepos依赖的作用是,数据过期后,将重新请求的数据进行缓存
     useEffect(() => {
-        // 缓存数据
+        // 缓存数据，如果放到getInitialProps中切换tab时还会重新请求所以使用useEffect
         if(!isServer) {
-            cacheUserRepos = userRepos
-            cacheUserStaredRepos = userStaredRepos
+            // 作为依赖之后当值是null时也会被设置，所以要添加判断
+            userRepos && cache.set('userRepos', userRepos)
+            userStaredRepos && cache.set('userStaredRepos', userStaredRepos)
+            // cacheUserRepos = userRepos
+            // cacheUserStaredRepos = userStaredRepos
+            // 使用setTimeout设置最长缓存时间不管使用与否
+            // const timeout = setTimeout(() => {
+            //     cacheUserRepos = null
+            //     cacheUserStaredRepos = null
+            // }, 1000 * 60 * 60);
         }
-    }, []);
+    }, [userRepos, userStaredRepos]);
 
     // 登录后显示的内容
     return (
@@ -124,12 +139,18 @@ Index.getInitialProps = async ({ctx, reduxStore}) => {
     // 判断是否有缓存
     // 需要判断是否服务端，服务端缓存会被共享
     if(!isServer) {
-        if(cacheUserRepos && cacheUserStaredRepos) {
+        if(cache.get('userRepos') && cache.get('userStaredRepos')) {
             return {
-                userRepos: cacheUserRepos,
-                userStaredRepos: cacheUserStaredRepos
+                userRepos: cache.get('userRepos'),
+                userStaredRepos: cache.get('userStaredRepos')
             }
         }
+        // if(cacheUserRepos && cacheUserStaredRepos) {
+        //     return {
+        //         userRepos: cacheUserRepos,
+        //         userStaredRepos: cacheUserStaredRepos
+        //     }
+        // }
     }
 
     // getInitialProps在服务端渲染会执行一次(服务端执行),跳转到这个页面也会执行一次(客户端执行)
