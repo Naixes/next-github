@@ -17,6 +17,7 @@ class MyApp extends App {
   }
 
   startLoading = () => {
+    console.log('loading');
     this.setState({loading: true})
   }
 
@@ -25,15 +26,17 @@ class MyApp extends App {
   }
 
   componentDidMount() {
-    Router.events.on('routerChangeStart', this.startLoading)
-    Router.events.on('routerChangeComplate', this.stopLoading)
-    Router.events.on('routerChangeError', this.stopLoading)
+    console.log('componentDidMount');
+    Router.events.on('routeChangeStart', this.startLoading)
+    Router.events.on('routeChangeComplete', this.stopLoading)
+    Router.events.on('routeChangeError', this.stopLoading)
   }
 
   componentWillUnmount() {
-    Router.events.off('routerChangeStart', this.startLoading)
-    Router.events.off('routerChangeComplate', this.stopLoading)
-    Router.events.off('routerChangeError', this.stopLoading)
+    console.log('componentWillUnmount');
+    Router.events.off('routeChangeStart', this.startLoading)
+    Router.events.off('routeChangeComplete', this.stopLoading)
+    Router.events.off('routeChangeError', this.stopLoading)
   }
 
   // 组件上的静态方法，用于在页面或App中数据获取，可以完成客户端和服务端数据的同步
