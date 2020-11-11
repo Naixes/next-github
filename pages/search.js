@@ -1,10 +1,11 @@
 import { withRouter } from "next/router"
-import { memo, isValidElement } from 'react'
+import { memo, isValidElement, useEffect } from 'react'
 import { Row, Col, List, Pagination } from 'antd'
 import Link from 'next/link'
 
 import {request} from '../lib/api'
 import Repo from '../components/Repo'
+import {cacheArray} from '../lib/repo-basic-cache'
 
 const per_page = 20
 // 过滤条件
@@ -69,6 +70,11 @@ function noop() {}
 function Search({router, repos}) {
     const query = router.query
     const { lang, sort, order, page } = router.query
+
+    // 缓存repo，详情使用
+    useEffect(() => {
+        !isServer &&  cacheArray(repos.items)
+    })
 
     return (
         <div className="root">

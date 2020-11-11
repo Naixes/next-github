@@ -1,5 +1,8 @@
 // @zeit/next-plugins中可以查找到相关文档
 const withCss = require('@zeit/next-css')
+const webpack = require('webpack')
+const withBundleAnalyzer = require('@zeit/next-bundle-analyzer')
+
 const config = require('./config')
 
 // 可配置项
@@ -59,8 +62,26 @@ if(typeof require !== 'undefined') {
 }
 // withCss()会增加webpack对css的配置，传入要修改的config，withCss会生成一个config对象
 // 传入{webpack(){}}可以修改webpack的配置，可以参考node_modules中插件的源码
-module.exports = withCss({
+module.exports = withBundleAnalyzer(withCss({
     publicRuntimeConfig: {
         OAUTH_URL: config.OAUTH_URL
+    },
+    webpack(config) {
+        // 忽略mement中的语言包
+        config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/,/moment$/))
+        return config
+    },
+    // 分析打包出的js的依赖关系
+    analyzeBrowser: ['browser', 'both'].includes(process.env.BUNDLE_ANALYZE),
+    bundleAnalyzerConfig: {
+        // 设置文件路径
+        server: {
+            analyzerMode: 'static',
+            reportFilename: '../bundles/server.html'
+        },
+        browser: {
+            analyzerMode: 'static',
+            reportFilename: '../bundles/client.html'
+        }
     }
-})
+}))

@@ -650,7 +650,7 @@ const Title = styled.h1`
 ...
 ```
 
-#### LazyLoading
+#### `LazyLoading`
 
 `nextjs`默认页面支持`LazyLoading`
 
@@ -1492,5 +1492,114 @@ Search.getInitialProps = async ({ctx}) => {
 }
 
 export default withRouter(Search)
+```
+
+### 详情页
+
+#### 布局
+
+`nextjs`没有提供非全局的布局方式，只能在页面中单独渲染
+
+`getInitialProps`中尽量使用`ctx.query`而不是`router.query`，防止获取到的是旧的`query`
+
+##### 将布局提取成一个`HOC`
+
+##### 基础信息缓存功能
+
+需要判断是否服务端，首页和搜索页都要缓存
+
+```js
+import LRU from 'lru-cache'
+
+const REPO_CACHE = new LRU({
+    maxAge: 1000 * 60 * 60
+})
+
+export function cache(repo) {
+    const full_name = repo.full_name
+    return REPO_CACHE.set(full_name, repo)
+}
+
+export function get(full_name) {
+    return REPO_CACHE.get(full_name)
+}
+
+export function cacheArray(repos) {
+    if(repos && Array.isArray(repos)) {
+        repos.forEach(repo => cache(repo))
+    }
+}
+```
+
+#### 处理`markdown`
+
+##### 解码
+
+谷歌浏览器可以在全局创建一个变量（`temp1`）用来保存较长的数据
+
+`atob(temp1)`可以将编码之后的`markdown`正常显示（不支持中文），`nodejs`没有这样的方法，需要做兼容（下载`atob`模块，给`nodejs`全局添加一个`atob`方法）
+
+##### 转义
+
+安装`markdown-it`，`github-markdown-css`
+
+##### 组件化
+
+```js
+
+```
+
+#### 工具
+
+`@zeit/next-bundle-analyzer`
+
+```js
+// next.config.js
+module.exports = withBundleAnalyzer(withCss({
+    ...
+    // 分析打包出的js的依赖关系
+    analyzeBrowser: ['browser', 'both'].includes(process.env.BUNDLE_ANALYZE),
+    bundleAnalyzerConfig: {
+      server: {
+        analyzerMode: 'static',
+        reportFilename: '../bundles/server.html'
+      },
+      browser: {
+        analyzerMode: 'static',
+        reportFilename: '../bundles/client.html'
+      }
+    }
+}))
+```
+
+`package.json`
+
+安装`cross-env`（windows）
+
+```json
+"scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "next start",
+    "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build"
+ },
+```
+
+##### 优化`detail.js`和`moment`
+
+将`MarkdownRenderer`异步加载单独打包，可以进行缓存
+
+忽略`moment`中的语言包
+
+```js
+// next.config.js
+module.exports = withBundleAnalyzer(withCss({
+    webpack(config) {
+        // 忽略mement中的语言包
+        config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/,/moment$/))
+        return config
+    },
+    ...
+}))
 ```
 

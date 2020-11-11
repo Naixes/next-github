@@ -7,6 +7,7 @@ import LRU from 'lru-cache'
 
 import api from "../lib/api";
 import Repo from '../components/Repo'
+import {cacheArray} from '../lib/repo-basic-cache'
 
 const isServer = typeof window === 'undefined'
 // let cacheUserRepos, cacheUserStaredRepos
@@ -56,6 +57,14 @@ const Index = ({router, user, userRepos, userStaredRepos}) => {
             //     cacheUserRepos = null
             //     cacheUserStaredRepos = null
             // }, 1000 * 60 * 60);
+        }
+    }, [userRepos, userStaredRepos]);
+
+    // 缓存单个repo，详情时使用
+    useEffect(() => {
+        if(!isServer) {
+            userRepos && cacheArray(userRepos)
+            userStaredRepos && cacheArray(userStaredRepos)
         }
     }, [userRepos, userStaredRepos]);
 
