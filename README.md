@@ -1537,7 +1537,20 @@ export function cacheArray(repos) {
 
 谷歌浏览器可以在全局创建一个变量（`temp1`）用来保存较长的数据
 
+`atob()`方法用于解码使用 base-64 编码的字符串。
+
+base-64 编码使用方法是 [btoa()](https://www.runoob.com/jsref/met-win-btoa.html) 。
+
 `atob(temp1)`可以将编码之后的`markdown`正常显示（不支持中文），`nodejs`没有这样的方法，需要做兼容（下载`atob`模块，给`nodejs`全局添加一个`atob`方法）
+
+```js
+const atob = require('atob');
+
+...
+// 设置nodejs全局变量
+global.atob = atob
+...
+```
 
 ##### 转义
 
@@ -1545,8 +1558,69 @@ export function cacheArray(repos) {
 
 ##### 组件化
 
-```js
+```jsx
+import {memo, useMemo} from 'react'
+import MarkdownIt from 'markdown-it'
+import 'github-markdown-css'
 
+const md = new MarkdownIt({
+  html: true, // 将md里的html转换
+  linkify: true // 把链接转成可点击的连接
+})
+
+// 解决atob中文解码后乱码问题：重新编码再解码
+function b64_to_utf8(str) {
+    // 已废弃，escape：生成新的由十六进制转义序列替换的字符串
+    // return decodeURIComponent(escape(atob(str)))
+    return decodeURIComponent(encodeURIComponent(atob(str)))
+}
+
+export default memo(function MarkdownRenderer({content, isBase64}) {
+    const markdown = isBase64 ? b64_to_utf8(content) : content
+    
+    // 将markdown转换成html
+    // useMemo返回一个 memoized 值
+    const html = useMemo(() => md.render(markdown), [markdown])
+
+    return (
+        <div className='markdown-body'>
+            <div dangerouslySetInnerHTML={{__html: html}}></div>
+        </div>
+    )
+})
+```
+
+`detail/index.js`
+
+```js
+import dynamic from 'next/dynamic'
+
+import withRepoBasic from '../../components/with-repo-basic'
+import {request} from '../../lib/api'
+
+// 可添加loading组件
+const MDRenderer = dynamic(() => import('../../components/MarkdownRender'), {
+    loading: () => (<div>loading...</div>)
+})
+
+const Detail = ({readme}) => {
+    return (
+        <MDRenderer content={readme.content} isBase64={true}/>
+    )
+}
+
+Detail.getInitialProps = async({ctx: {query: {owner, name}, req, res}}) => {
+    const readmeRes = await request(
+        {url: `/repos/${owner}/${name}/readme`},
+        req,
+        res
+    )
+    return {
+        readme: readmeRes.data
+    }
+}
+
+export default withRepoBasic(Detail)
 ```
 
 #### 工具

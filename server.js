@@ -4,6 +4,7 @@ const next = require('next')
 const session = require('koa-session')
 const Redis = require('ioredis')
 const koaBody = require('koa-body')
+const atob = require('atob');
 
 const config = require('./config')
 // eedisSessionStore
@@ -19,6 +20,9 @@ const dev = process.env.NODE_ENV !== 'production'
 // 传入是否开发状态
 const app = next({ dev })
 const handler = app.getRequestHandler()
+
+// 设置nodejs全局变量
+global.atob = atob
 
 // 先编译pages
 app.prepare().then(() => {
