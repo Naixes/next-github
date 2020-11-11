@@ -67,7 +67,7 @@ module.exports = withBundleAnalyzer(withCss({
         OAUTH_URL: config.OAUTH_URL
     },
     webpack(config) {
-        // 忽略mement中的语言包
+        // 忽略mement中的语言包，可以在使用的地方单独引入
         config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/,/moment$/))
         return config
     },
