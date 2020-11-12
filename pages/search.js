@@ -41,6 +41,8 @@ const selectedItemStyle = {
   fontWeight: 'bold'
 }
 
+const isServer = typeof window === 'undefined'
+
 /**
  * sort: 排序方式
  * order: 排序顺序

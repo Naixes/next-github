@@ -23,6 +23,7 @@
     "koa-body": "^4.2.0",
     "koa-router": "^9.4.0",
     "koa-session": "^6.1.0",
+    "lodash": "^4.17.20",
     "lru-cache": "^6.0.0",
     "markdown-it": "^12.0.2",
     "moment": "^2.29.1",

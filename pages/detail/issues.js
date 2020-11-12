@@ -3,12 +3,17 @@ import { Avatar, Button, Select, Spin } from 'antd'
 import dynamic from 'next/dynamic'
 
 import WithRepoBasic from '../../components/with-repo-basic'
+import SearchUser from '../../components/SearchUser'
 import { request } from '../../lib/api'
 import { getLastUpdated } from '../../lib/utils'
 
 const MDRender = dynamic(() => import('../../components/MarkdownRender'), {
   loading: () => <p>Loading</p>
 })
+
+const Option = Select.Option
+const CACHE = {}
+const isServer = typeof window === 'undefined'
 
 function IssueDetail({ issue }) {
   return (
@@ -130,29 +135,76 @@ const IssueItem = function({issue}) {
     )
 }
 
+// 获取请求参数
+function makeQuery(creator, state, labels) {
+  let creatorStr = creator ? `creator=${creator}` : ''
+  let stateStr = state ? `state=${state}` : ''
+  let labelStr = ''
+  if (labels && labels.length) {
+    labelStr = `labels=${labels.join(',')}`
+  }
+
+  const arr = []
+
+  creatorStr && arr.push(creatorStr)
+  stateStr && arr.push(stateStr)
+  labelStr && arr.push(labelStr)
+
+  return `?${arr.join('&')}`
+}
+
 const Issues = ({ initialIssues, labels, owner, name }) => {
+    const [creator, setCreator] = useState()
+    const [state, setState] = useState()
+    const [label, setLabel] = useState([])
     const [issues, setIssues] = useState(initialIssues)
+    const [fetching, setFetching] = useState(false)
+  
+    // 选中搜索结果的回调
+    const handleCreatorChange = useCallback(value => {
+      setCreator(value)
+    }, [])
+  
+    const handleStateChange = useCallback(value => {
+      setState(value)
+    }, [])
+  
+    const handleLabelChange = useCallback(value => {
+      setLabel(value)
+    }, [])
+  
+    const handleSearch = useCallback(() => {
+      setFetching(true)
+      request({
+        url: `/repos/${owner}/${name}/issues${makeQuery(creator, state, label)}`
+      })
+        .then(resp => setIssues(resp.data))
+        .catch(err => console.error(err))
+        .finally(() => {
+          setFetching(false)
+        })
+    }, [owner, name, creator, state, label])
 
     return (
         <div className="root">
-            {/* <div className="search">
+            <div className="search">
                 <SearchUser onChange={handleCreatorChange} value={creator} />
                 <Select
-                placeholder="状态"
-                onChange={handleStateChange}
-                value={state}
-                style={{ width: 200, marginLeft: 20 }}
+                    placeholder="状态"
+                    onChange={handleStateChange}
+                    value={state}
+                    style={{ width: 200, marginLeft: 20 }}
                 >
                 <Option value="all">all</Option>
                 <Option value="open">open</Option>
                 <Option value="closed">closed</Option>
                 </Select>
                 <Select
-                mode="multiple"
-                placeholder="Label"
-                onChange={handleLabelChange}
-                value={label}
-                style={{ flexGrow: 1, marginLeft: 20, marginRight: 20 }}
+                    mode="multiple"
+                    placeholder="Label"
+                    onChange={handleLabelChange}
+                    value={label}
+                    style={{ flexGrow: 1, marginLeft: 20, marginRight: 20 }}
                 >
                 {labels.map(la => (
                     <Option value={la.name} key={la.id}>
@@ -163,18 +215,18 @@ const Issues = ({ initialIssues, labels, owner, name }) => {
                 <Button type="primary" onClick={handleSearch} disabled={fetching}>
                 搜索
                 </Button>
-            </div> */}
-          {/* {fetching ? (
+            </div>
+          {fetching ? (
             <div className="loading">
               <Spin />
             </div>
-          ) : ( */}
+          ) : (
             <div className="issues">
               {issues.map(issue => (
                 <IssueItem issue={issue} key={issue.id}></IssueItem>
               ))}
             </div>
-          {/* )} */}
+          )}
           <style jsx>{`
             .issues {
               border: 1px solid #eee;

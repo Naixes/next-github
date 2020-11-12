@@ -112,7 +112,7 @@ const MyLayout = ({children, user, router, logout}) => {
                 height: 100%;
             }
             .ant-layout {
-                min-height: 100%;
+                min-height: 100% !important;
             }
             .ant-layout-header {
                 padding-left: 0;
