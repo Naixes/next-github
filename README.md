@@ -1687,9 +1687,30 @@ module.exports = withBundleAnalyzer(withCss({
 
 缓存`labels`
 
-### 静态页面导出
+### `nextjs`的静态页面导出
 
 `nextjs`提供，导出时并非服务端渲染环境，服务端渲染代码不一定会执行
 
-`'export': 'next export'`
+1. `'export': 'next export'`
 
+`run export`时并非出于浏览器和服务器渲染环境，没有`window`，`ctx`的`req`和`res`是不存在的，也不会启动`server`，本项目不适合静态页面导出
+
+2. `http-server`：`http-server xxx`启动一个静态服务
+
+3. 如果想要修改路由显示需要增加配置`next.config.js`
+
+```js
+exportPathMap: async (defaultMap) => {
+    return {
+        ...defaultMap,
+        '/repos/2': {page: '/repos', query: {page: 2}},
+        ...
+    }
+}
+```
+
+静态网站推荐`gatsby`
+
+### 部署
+
+提交代码

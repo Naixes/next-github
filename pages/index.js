@@ -137,6 +137,8 @@ const Index = ({router, user, userRepos, userStaredRepos}) => {
 // req 和 res只有在服务端渲染时才能拿到
 // getInitialProps局限性：返回的数据发生变化不会重新执行，所以返回的数据应该是不会变化的数据，所以isLogin不能在页面上来判断用户是否登录
 Index.getInitialProps = async ({ctx, reduxStore}) => {
+    // run export时并非出于浏览器和服务器渲染环境，没有window，ctx的req，res是不存在的，也不会启动server
+
     // 判断是否登录
     const user = reduxStore.getState().user
     if(!user || !user.id) {
