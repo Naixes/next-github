@@ -1684,3 +1684,12 @@ module.exports = withBundleAnalyzer(withCss({
 更接近中后台的方式
 
 优化
+
+缓存`labels`
+
+### 静态页面导出
+
+`nextjs`提供，导出时并非服务端渲染环境，服务端渲染代码不一定会执行
+
+`'export': 'next export'`
+

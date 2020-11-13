@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Avatar, Button, Select, Spin } from 'antd'
 import dynamic from 'next/dynamic'
 
@@ -154,11 +154,20 @@ function makeQuery(creator, state, labels) {
 }
 
 const Issues = ({ initialIssues, labels, owner, name }) => {
+    // 检索条件
     const [creator, setCreator] = useState()
     const [state, setState] = useState()
     const [label, setLabel] = useState([])
     const [issues, setIssues] = useState(initialIssues)
+    // 加载中标记
     const [fetching, setFetching] = useState(false)
+
+    // 缓存labels
+    if(!isServer) {
+      useEffect(() => {
+        CACHE[`${owner}/${name}`] = labels
+      }, [owner, name, labels])
+    }
   
     // 选中搜索结果的回调
     const handleCreatorChange = useCallback(value => {
@@ -195,9 +204,9 @@ const Issues = ({ initialIssues, labels, owner, name }) => {
                     value={state}
                     style={{ width: 200, marginLeft: 20 }}
                 >
-                <Option value="all">all</Option>
-                <Option value="open">open</Option>
-                <Option value="closed">closed</Option>
+                    <Option value="all">all</Option>
+                    <Option value="open">open</Option>
+                    <Option value="closed">closed</Option>
                 </Select>
                 <Select
                     mode="multiple"
@@ -251,17 +260,21 @@ const Issues = ({ initialIssues, labels, owner, name }) => {
 Issues.getInitialProps = async({ctx}) => {
     const {owner, name} = ctx.query
 
+    const full_name = `${owner}/${name}`
+
     const fetchs = await Promise.all([
         await request(
             {url: `/repos/${owner}/${name}/issues`},
             ctx.req,
             ctx.res
         ),
-        await request(
+        CACHE[full_name] 
+          ? Promise.resolve({data: CACHE[full_name]}) 
+          : await request(
             {url: `/repos/${owner}/${name}/labels`},
             ctx.req,
             ctx.res
-        )
+          )
     ])
     const [IssuesResp, labelsResp] = fetchs
 
